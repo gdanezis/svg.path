@@ -1,21 +1,17 @@
 # SVG Path specification parser
 
 from . import path 
+from re import findall
 
 COMMANDS = 'MmZzLlHhVvCcSsQqTtAa'
 UPPERCASE = 'MZLHVCSQTA'
 
 def _tokenize_path(pathdef):
-    # Commas and minus-signs are separators, just like spaces.
-    pathdef = pathdef.replace(',', ' ').replace('e-', 'XX').replace('E-', 'XX').replace('-', ' -').replace('XX', 'e-')
-    
-    # Commands are allowed without spaces around. Let's insert spaces so it's
-    # easier to split later.
-    for c in COMMANDS:
-        pathdef = pathdef.replace(c, ' %s ' % c)
-        
-    # Split the path into elements and reverse, for easy use of .pop()
-    return pathdef.split()
+    command_re = "[MmZzLlHhVvCcSsQqTtAa]"
+    float_re   = "[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?"
+    token_re = "(%s|%s)" % (command_re, float_re)
+    tokens = findall(token_re, pathdef)
+    return tokens
     
     
 def parse_path(pathdef, current_pos=0j):
